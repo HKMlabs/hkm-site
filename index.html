@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HKM</title>
+  <meta name="description" content="Türkiye’de sağlık bilgisini herkes için anlaşılır ve güvenilir kılmak." />
+
+  <style>
+    :root{
+      --bg: #EAF8FA;
+      --grad-left: #3BB9E6;
+      --grad-right:#31D5D3;
+      --text: #063A40;
+      --stroke: rgba(6,58,64,.14);
+      --shadow: 0 14px 40px rgba(2, 6, 23, .12);
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 500px at 50% -10%, rgba(59,185,230,.35), transparent 70%),
+        radial-gradient(900px 450px at 90% 10%, rgba(49,213,211,.35), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    .hero{
+      width:min(960px, 100%);
+      position:relative;
+      overflow:hidden;
+      border-radius:26px;
+      padding:48px 28px;
+      background: linear-gradient(90deg, var(--grad-left), var(--grad-right));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.25);
+      text-align:center;
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-140px; top:-160px;
+      width:520px; height:520px;
+      border-radius:50%;
+      background: rgba(234,248,250,.70);
+      opacity:.95;
+    }
+
+    h1{
+      position:relative;
+      margin:0;
+      font-size:60px;
+      line-height:1;
+      letter-spacing:1px;
+      color: rgba(6,58,64,.92);
+      text-shadow: 0 1px 0 rgba(255,255,255,.45);
+    }
+
+    /* SLOGAN: daha canlı */
+    .subtitle{
+      position:relative;
+      margin:14px auto 0;
+      font-size:19px;
+      line-height:1.55;
+      max-width:60ch;
+      color: rgba(6,58,64,.98);
+      font-weight: 650;
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+    }
+
+    .cta{
+      position:relative;
+      margin-top:22px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px 18px;
+      border-radius:999px;
+      background: rgba(247,254,255,.92);
+      border: 1px solid rgba(6,58,64,.16);
+      font-weight:700;
+      font-size:15px;
+      color: rgba(6,58,64,.92);
+      backdrop-filter: blur(10px);
+      cursor:pointer;
+      transition: transform .12s ease;
+    }
+    .cta:hover{ transform: translateY(-1px); }
+
+    footer{
+      margin-top:16px;
+      text-align:center;
+      font-size:12.5px;
+      color: rgba(6,58,64,.55);
+      position:relative;
+    }
+
+    @media (max-width: 680px){
+      h1{ font-size:48px; }
+      .subtitle{ font-size:17.5px; }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="hero">
+    <h1>HKM</h1>
+    <p class="subtitle">
+      Türkiye’de sağlık bilgisini herkes için anlaşılır ve güvenilir kılmak.
+    </p>
+
+    <!-- TEK BUTON -->
+    <a class="cta" href="gunce.html">Günce</a>
+
+    <footer>HKM • GitHub Pages</footer>
+  </section>
+</body>
+</html>
