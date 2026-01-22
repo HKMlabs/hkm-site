@@ -20,7 +20,10 @@
   const REPO  = "hkm-site";
   const LABEL = "gunce";
 
-  const esc = (s="") => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const esc = (s="") => s.replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+
   const nl2br = (s="") => esc(s).replace(/\n/g, "<br>");
 
   const fmtTR = (iso) => {
@@ -42,9 +45,7 @@
     .then(r => r.json())
     .then(items => {
       if (!Array.isArray(items)) throw new Error("API hata");
-      // PR’leri ayıkla (issue listesinde bazen PR gelir)
-      items = items.filter(x => !x.pull_request);
-
+      items = items.filter(x => !x.pull_request); // PR’leri ayıkla
       items.sort((a,b) => (b.created_at||"").localeCompare(a.created_at||""));
 
       const html = items.map(x => `
@@ -54,9 +55,6 @@
           </div>
           <div style="margin-top:6px;opacity:.92;line-height:1.55">
             ${nl2br(x.body || "")}
-          </div>
-          <div style="margin-top:8px;font-size:13px;opacity:.65">
-            <a href="${x.html_url}" target="_blank" rel="noopener noreferrer">GitHub’da aç / düzenle</a>
           </div>
         </div>
       `).join("");
