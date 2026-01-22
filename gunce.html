@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="tr">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Günce — HKM</title>
+
+<body style="font-family:system-ui,Arial,sans-serif;margin:20px;background:#EAF8FA;color:#063A40">
+  <h1>Günce</h1>
+  <p style="max-width:70ch;opacity:.88">
+    HKM’nin günlük notları, duyuruları, yön değişimleri ve düşünsel refleksiyonları burada kronolojik olarak yayınlanır.
+    Her kayıt tarih ve saat bilgisiyle arşivlenir.
+  </p>
+
+  <div id="list">Yükleniyor…</div>
+
+  <p style="margin-top:20px"><a href="./">← Ana sayfa</a></p>
+
+<script>
+  const OWNER = "HKMlabs";
+  const REPO  = "hkm-site";
+  const LABEL = "gunce";
+
+  const esc = (s="") => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const nl2br = (s="") => esc(s).replace(/\n/g, "<br>");
+
+  const fmtTR = (iso) => {
+    try{
+      const d = new Date(iso);
+      return new Intl.DateTimeFormat("tr-TR", {
+        timeZone: "Europe/Istanbul",
+        year:"numeric", month:"2-digit", day:"2-digit",
+        hour:"2-digit", minute:"2-digit"
+      }).format(d);
+    }catch(e){
+      return iso || "";
+    }
+  };
+
+  const url = `https://api.github.com/repos/${OWNER}/${REPO}/issues?state=all&labels=${encodeURIComponent(LABEL)}&per_page=100`;
+
+  fetch(url)
+    .then(r => r.json())
+    .then(items => {
+      if (!Array.isArray(items)) throw new Error("API hata");
+      // PR’leri ayıkla (issue listesinde bazen PR gelir)
+      items = items.filter(x => !x.pull_request);
+
+      items.sort((a,b) => (b.created_at||"").localeCompare(a.created_at||""));
+
+      const html = items.map(x => `
+        <div style="padding:12px;margin:10px 0;border:1px solid rgba(6,58,64,.14);border-radius:12px;background:#F7FEFF">
+          <div style="font-weight:800">
+            ${fmtTR(x.created_at)} — ${esc(x.title || "")}
+          </div>
+          <div style="margin-top:6px;opacity:.92;line-height:1.55">
+            ${nl2br(x.body || "")}
+          </div>
+          <div style="margin-top:8px;font-size:13px;opacity:.65">
+            <a href="${x.html_url}" target="_blank" rel="noopener noreferrer">GitHub’da aç / düzenle</a>
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("list").innerHTML = html || "Henüz kayıt yok.";
+    })
+    .catch(() => {
+      document.getElementById("list").innerHTML =
+        "Günce yüklenemedi. (Issues açık mı? Etiket adı 'gunce' mi?)";
+    });
+</script>
+</body>
+</html>
