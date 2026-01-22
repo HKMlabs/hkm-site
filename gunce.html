@@ -1,19 +1,150 @@
 <!doctype html>
 <html lang="tr">
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Günce — HKM</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Günce — HKM</title>
 
-<body style="font-family:system-ui,Arial,sans-serif;margin:20px;background:#EAF8FA;color:#063A40">
-  <h1>Günce</h1>
-  <p style="max-width:70ch;opacity:.88">
-    HKM’nin günlük notları, duyuruları, yön değişimleri ve düşünsel refleksiyonları burada kronolojik olarak yayınlanır.
-    Her kayıt tarih ve saat bilgisiyle arşivlenir.
-  </p>
+  <style>
+    :root{
+      --bg: #EAF8FA;
+      --card: rgba(247,254,255,.92);
+      --text: #063A40;
+      --muted: rgba(6,58,64,.72);
+      --stroke: rgba(6,58,64,.14);
+      --shadow: 0 14px 40px rgba(2, 6, 23, .12);
+      --grad-left: #3BB9E6;
+      --grad-right:#31D5D3;
+    }
 
-  <div id="list">Yükleniyor…</div>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 500px at 50% -10%, rgba(59,185,230,.35), transparent 70%),
+        radial-gradient(900px 450px at 90% 10%, rgba(49,213,211,.35), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+      padding:24px;
+    }
 
-  <p style="margin-top:20px"><a href="./">← Ana sayfa</a></p>
+    .wrap{max-width:980px;margin:0 auto}
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      border-radius:26px;
+      padding:28px 22px;
+      background: linear-gradient(90deg, var(--grad-left), var(--grad-right));
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.25);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-140px; top:-160px;
+      width:520px; height:520px;
+      border-radius:50%;
+      background: rgba(234,248,250,.70);
+      opacity:.95;
+    }
+
+    .hero-inner{position:relative;display:flex;flex-direction:column;gap:10px}
+    h1{margin:0;font-size:44px;letter-spacing:.2px}
+    .sub{
+      margin:0;
+      max-width:70ch;
+      color: rgba(6,58,64,.92);
+      font-weight:600;
+      text-shadow: 0 1px 0 rgba(255,255,255,.35);
+      line-height:1.55;
+    }
+
+    .top-actions{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 14px;
+      border-radius:999px;
+      background: rgba(247,254,255,.92);
+      border: 1px solid rgba(6,58,64,.16);
+      font-weight:700;
+      font-size:14px;
+      color: rgba(6,58,64,.92);
+      text-decoration:none;
+      backdrop-filter: blur(10px);
+      cursor:pointer;
+      transition: transform .12s ease;
+    }
+    .btn:hover{transform: translateY(-1px);}
+
+    .hint{
+      margin:10px 2px 0;
+      font-size:13px;
+      color: rgba(6,58,64,.60);
+    }
+
+    .content{margin-top:14px}
+
+    .card{
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius:18px;
+      box-shadow: 0 10px 26px rgba(2,6,23,.06);
+      padding:14px;
+      margin:12px 0;
+      backdrop-filter: blur(10px);
+    }
+
+    .meta{
+      font-weight:800;
+      font-size:18px;
+      margin:0 0 6px;
+      color: rgba(6,58,64,.92);
+    }
+
+    .body{
+      margin:0;
+      color: rgba(6,58,64,.86);
+      line-height:1.65;
+      white-space:pre-wrap;
+    }
+
+    @media (max-width:680px){
+      h1{font-size:36px}
+      .meta{font-size:16px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-inner">
+        <h1>Günce</h1>
+        <p class="sub">
+          HKM’nin günlük notları, duyuruları, yön değişimleri ve düşünsel refleksiyonları burada kronolojik olarak yayınlanır.
+          Her kayıt tarih ve saat bilgisiyle arşivlenir.
+        </p>
+        <div class="top-actions">
+          <a class="btn" href="./">← Ana sayfa</a>
+        </div>
+        <div class="hint" id="status">Kayıtlar yükleniyor…</div>
+      </div>
+    </section>
+
+    <div class="content" id="list"></div>
+  </div>
 
 <script>
   const OWNER = "HKMlabs";
@@ -24,15 +155,15 @@
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[c]));
 
-  const nl2br = (s="") => esc(s).replace(/\n/g, "<br>");
-
+  // Tarih + SAAT:DAKİKA
   const fmtTR = (iso) => {
     try{
       const d = new Date(iso);
       return new Intl.DateTimeFormat("tr-TR", {
         timeZone: "Europe/Istanbul",
-        year:"numeric", month:"2-digit", day:"2-digit",
-        hour:"2-digit", minute:"2-digit"
+        day:"2-digit", month:"2-digit", year:"numeric",
+        hour:"2-digit", minute:"2-digit",
+        hour12:false
       }).format(d);
     }catch(e){
       return iso || "";
@@ -45,25 +176,29 @@
     .then(r => r.json())
     .then(items => {
       if (!Array.isArray(items)) throw new Error("API hata");
-      items = items.filter(x => !x.pull_request); // PR’leri ayıkla
+      items = items.filter(x => !x.pull_request);
       items.sort((a,b) => (b.created_at||"").localeCompare(a.created_at||""));
 
-      const html = items.map(x => `
-        <div style="padding:12px;margin:10px 0;border:1px solid rgba(6,58,64,.14);border-radius:12px;background:#F7FEFF">
-          <div style="font-weight:800">
-            ${fmtTR(x.created_at)} — ${esc(x.title || "")}
-          </div>
-          <div style="margin-top:6px;opacity:.92;line-height:1.55">
-            ${nl2br(x.body || "")}
-          </div>
-        </div>
-      `).join("");
+      const list = document.getElementById("list");
+      const status = document.getElementById("status");
 
-      document.getElementById("list").innerHTML = html || "Henüz kayıt yok.";
+      if (items.length === 0){
+        status.textContent = "Henüz kayıt yok.";
+        list.innerHTML = "";
+        return;
+      }
+
+      status.textContent = `${items.length} kayıt`;
+      list.innerHTML = items.map(x => `
+        <article class="card">
+          <div class="meta">${fmtTR(x.created_at)} — ${esc(x.title || "")}</div>
+          <p class="body">${esc(x.body || "")}</p>
+        </article>
+      `).join("");
     })
     .catch(() => {
-      document.getElementById("list").innerHTML =
-        "Günce yüklenemedi. (Issues açık mı? Etiket adı 'gunce' mi?)";
+      document.getElementById("status").textContent =
+        "Kayıtlar yüklenemedi. (Issues açık mı? Etiket adı 'gunce' mi?)";
     });
 </script>
 </body>
